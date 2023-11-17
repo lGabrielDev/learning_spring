@@ -1,0 +1,53 @@
+ <h1 align="center">
+    MVC - Model View Controller
+    <img alt="MVC flow" src="https://cdn2.iconfinder.com/data/icons/programming-76/512/MVC-model-view-controller-512.png" width="90px" align="center">
+ </h1>
+
+<!-- MVC flow -->
+<div style="display:flex; flex-direction:row; justify-content:center" >
+    <img alt="MVC flow" src="./imgs/fluxo_MVC.png" width="600px">
+</div>
+
+<br>
+
+O padrão MVC é um padrão de arquitetura de software, que divide a aplicação em 3 camadas:
+
+1. **MODEL**
+2. **VIEW**
+2. **CONTROLLER**
+
+
+<hr>
+<br>
+
+## **View(visao)** <img alt="MVC flow" src="https://cdn2.iconfinder.com/data/icons/seo-and-internet-round/128/13-256.png" width="50px" align="center">
+Interface gráfica onde o usuário envia ou recebe dados. É a camada de contato direto com o usuário.
+
+Ex: Página html, pagina de aplicativo, terminal/console, etc... Inclusive, o **terminal/console** vai ser a view que vamos utilizar nesse projeto.
+
+<br>
+
+## **Controller** <img alt="MVC flow" src="https://camo.githubusercontent.com/94c921b211fd0a5a5f8dcc67491ee1591d1ef0311952664a219507de2bbf24f3/68747470733a2f2f63646e2d69636f6e732d706e672e666c617469636f6e2e636f6d2f3531322f323939382f323939383736322e706e67" width="50px" align="center">
+Camada que cria e controla as rotas na aplicação. É aqui que recebemos a solicitacao/request do cliente e pedimos para a model fornecer esses dados.
+
+<br>
+
+## **Model** <img alt="MVC flow" src="https://camo.githubusercontent.com/d5196e02d28091d7e7f3ea680504e6e91b194247d3b08321776a5487c4cdfddc/68747470733a2f2f696d672e69636f6e73382e636f6d2f65787465726e616c2d6974696d323130312d626c75652d6974696d323130312f3235362f65787465726e616c2d626c75657072696e742d656e67696e656572696e672d6974696d323130312d626c75652d6974696d323130312d342e706e67" width="50px" align="center">
+Camada que representa os dados da aplicação. É aqui que vamos pegar os dados do banco de dados.
+
+É aqui que teremos os packages **Service** and **Repository**.
+
+- **Model/Entity** --> Representacao em forma de Classe dos dados de um banco de dados. Onde, a Class representa uma table do banco, e os attributes representam os campos dessa table.
+
+- **Service** --> Responsável em fazer as lógicas do negócio. Ex: Só pode cadastrar "Students" acima de 18 anos. È aqui que criamos essa lógica.
+
+- **Repository** --> Responsável em acessar o banco de dados. É aqui que fazemos nossas queries.
+
+
+
+
+
+
+
+
+
