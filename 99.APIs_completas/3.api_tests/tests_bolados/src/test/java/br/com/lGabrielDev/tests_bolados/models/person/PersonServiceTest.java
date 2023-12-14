@@ -1,207 +1,20 @@
-<h1 align="center">
-    <span>Testando os methods da Service</span>
-    <img src="https://cdn3.iconfinder.com/data/icons/education-ultimate-set/512/exam_tests-512.png" alt="image" width="100px" align="center">
-</h1>
+package br.com.lGabrielDev.tests_bolados.models.person;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
+import br.com.lGabrielDev.tests_bolados.exceptions.NameCannotBeNullException;
+import br.com.lGabrielDev.tests_bolados.models.Person.Person;
+import br.com.lGabrielDev.tests_bolados.models.Person.PersonRepository;
+import br.com.lGabrielDev.tests_bolados.models.Person.PersonService;
+import br.com.lGabrielDev.tests_bolados.models.Person.dtos.PersonCreateDTO;
+import java.util.List;
+import java.util.Optional;
+import java.util.Arrays;
 
-
-Antes de saber como testar os methods da nossa Service Class, vamos criar uma Service class.
-
-
-Não se importe com as validacoes. <p id="service_methods">O importante é aprendermos a fazer os testes. Crie uma Service Class o mais simples possível.</p>
-
-```java
-@Service
-public class PersonService {
-    
-    //injected attributes
-    
-    @Autowired
-    private PersonRepository pr;
-
-
-    // ================================= READ =================================
-
-    // ============= FindAll =============
-    public List<Person> getAllPersons(){
-        return this.pr.findAll();
-    }
-
-
-    // ============= findByID =============
-    public Person getPersonById(Long id){
-        Optional<Person> pOptional = this.pr.findById(id);
-
-        if(pOptional.isEmpty()){
-            throw new RuntimeException("Person not found");
-            
-        }
-        return pOptional.get();
-    }
- 
-    // ============= findByEmail =============
-    public Person getPersonByEmail(String email){
-        Optional<Person> pOptional = this.pr.findByEmail(email);
-
-        if(pOptional.isEmpty()){
-            throw new RuntimeException("Person not found");    
-        }
-        return pOptional.get();
-
-    }
-
-
-    // ================================= CREATE =================================
-    public Person createPerson(PersonCreateDTO newPerson){
-        //validamos se o campo "name" foi inserido
-        if(newPerson.getName() == null){
-            throw new NameCannotBeNullException("Name nao pode estar em branco");
-        }
-
-        Person p1 = new Person();
-        p1.setName(newPerson.getName());
-        p1.setEmail(newPerson.getEmail());
-
-        return this.pr.save(p1);
-    }
-
-
-
-    // ================================= UPDATE =================================
-    public Person updatePerson(Long id, PersonCreateDTO newPerson){
-        Optional<Person> pOptional = this.pr.findById(id);
-
-        if(pOptional.isEmpty()){
-            throw new RuntimeException("Nao eh possivel alterar, pois nao existe uma pessoa com esse #id");
-        }
-        
-        Person p1 = pOptional.get();
-        p1.setName(newPerson.getName());
-        p1.setEmail(newPerson.getEmail());
-        
-        return this.pr.save(p1);
-    }
-
-
-    // ================================= DELETE =================================
-    public String deletePerson(Long id){
-        Optional<Person> pOptional = this.pr.findById(id);
-
-        if(pOptional.isEmpty()){
-            throw new RuntimeException("Nao eh possivel deletar, pois nao existe uma pessoa com esse #id");
-        }
-
-        this.pr.deleteById(id);
-
-        return "Deletado com sucesso!";
-    }
-}
-```
-
-O objetivo é testarmos cada method dessa Service Class.
-
-
-<hr>
-<br>
-
-## Passo a passo para testar os methods da Service Class  <img src="https://cdn4.iconfinder.com/data/icons/agile-methodology-flaticon/64/requirement-steps-planning-documents-clipboard-512.png" alt="icon image" width="70px" align="center">
-
-
-
-Para testar os methods de uma Service Class precisamos:
-
-1. `@ExtendWith(MockitoExtension.class)` --> Informamos que a class atual utilizará "mocks" 
-
-<br>
-
-2. `@Mock` --> Utilizado para "mockar"/fingir o comportamente dos methods daquela class.
-
-<br>
-
-3. `@InjectMocks` --> Usado para injetar esses "mocks" na Class que vamos testar. Assim, Se a service utilizar algum method da repository, esses methods da repository estarão "mockados"/findigos.
-
-<br>
-
-4. Testamos os methods, utilizando o padrao AAA (**Arrange**, **Act**, **Assert**)
-
-<br>
-
-📖 Sempre comece pelo **act**. O entendimento é mais facil. Sempre comece executando o method que voce deseja testar.
-
-
-<br>
-
-## Exemplo:
-
-Importante entender que sempre que estamos testando os methods da Service Class, só queremos testar OS METHODS DA SERVICE CLASS. Nao importa como funcionam os methods da Repository ou de qualquer outra dependencie que a Service Class esteja usando.
-Só vamos nos preocupar com os methods da Service Class.
-
-
-Ex:
-
-Vamos fazer o teste do method `getAllPersons()` da Service Class. Esse method retorna um outro method da Repository que é o `findAll()`. Não nos interessa como funciona esse `findAll()` da repository. Logo, vamos fingir/definir como esse method vai funcionar. Logo, esse method é um method "mockado"/fingido.
-
-
-```java
-@ExtendWith(MockitoExtension.class) //informamos que essa class vai utilizar "mocks"
-public class PersonServiceTest {
-
-
-    @InjectMocks //injetamos todos os "mocks" para a class que vamos testar os methods. Assim, todos os methods que não sejam da Service Class serão "mockados"/fingidos por nós.
-    private PersonService ps; //Class que contem os methods que vamos testar
-
-
-    //informamos os "mocks" que vao ser injetados na class dos methods que serao testados
-    @Mock //todos os methods da class "PersonRepository" serão "mockados"/fingidos. Ou seja, nós que vamos decidir oque esses methods farao. Entao, todos os methods da repository que estiverem na service class serão methods fingidos.
-    private PersonRepository pr;
-
-
-
-    // ============= FindAll =============
-    @Test
-    public void itShouldReturnsAListOfPersons(){
-        //arrange
-        Person p1 = new Person("Naruto", "narutinho@gmail.com");
-        Person p2 = new Person("Sasuke", "uchiha@gmail.com");
-
-        List<Person> persons = Arrays.asList(p1,p2);
-
-
-        //informamos como os methods mockados devem se comportar
-        Mockito.when(this.pr.findAll()).thenReturn(persons);
-
-
-        //act
-        List<Person> methodResult = this.ps.getAllPersons();
-
-        //assert
-        Assertions.assertThat(methodResult).hasSize(2); //afirmamos que essa lista tera 2 pessoas
-        Assertions.assertThat(methodResult).isNotEmpty(); //afirmamos que essa lista nao esta vazia
-        Assertions.assertThat(methodResult).containsExactly(p1,p2); //afirmamos que essa lista vai conter exatamente a "p1" e "p2"
-    }
-}
-```
-
-
-📖 Sempre que a Class que vamos testar tiver attributes injetados, nós precisamos transformar esses attributes injetados em "mocks". Ou seja, methods fingidos/fakes.
-
-Nesse caso, a Class "PersonService" possui 1 attribute injetado, que é a "PersonRepository". Para conseguirmos testar apenas os methods da Service, precisamos transformar a PersonRepository em um "mock". Ou seja, não nos interessa o que os methods da repository fazem. Nós só estamos preocupados nos methods da Service. Aí, na hora de testar os methods da service, vamos definir como os methods desse "mock" vao se comportar.
-
-
-
-<hr>
-<br>
-
-## Testando todos os methods da Service
-
-Seguindo os methods criados na Service, visto [aqui](#service_methods), vamos testar cada um deles.
-
-<br>
-
-💡 Coloque a class "PersonServiceTest" de um lado e do outro coloque a "PersonService". Assim fica mais facil de testar os methods. Vai batendo um por um.
-
-<br>
-
-```java
 @ExtendWith(MockitoExtension.class) //informamos que essa class de test vai utilizar "mocks"
 public class PersonServiceTest {
 
@@ -463,6 +276,3 @@ public class PersonServiceTest {
 
     }
 }
-```
-
-📖 Sempre comece pelo **act**, pois o entendimento é mais facil. Sempre comece executando o method que voce deseja testar.

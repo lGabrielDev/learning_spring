@@ -1,224 +1,25 @@
-<h1 align="center">
-    <span>Testando os methods da Controller</span>
-    <img src="https://cdn3.iconfinder.com/data/icons/education-ultimate-set/512/exam_tests-512.png" alt="image" width="100px" align="center">
-</h1>
+package br.com.lGabrielDev.tests_bolados.models.person;
+import java.util.List;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import br.com.lGabrielDev.tests_bolados.exceptions.NameCannotBeNullException;
+import br.com.lGabrielDev.tests_bolados.exceptions.PersonNotFoundException;
+import br.com.lGabrielDev.tests_bolados.models.Person.Person;
+import br.com.lGabrielDev.tests_bolados.models.Person.PersonController;
+import br.com.lGabrielDev.tests_bolados.models.Person.PersonService;
+import br.com.lGabrielDev.tests_bolados.models.Person.dtos.PersonCreateDTO;
 
-## Criando nossa Service and Controller
 
-Antes de aprendermos a testar os methods da Controller, vamos setar nossa Service e nossa Controller. Vamos deixar eles bonitinhos...
-
-
-Nao se preocupe com a complexidade das validacoes. Deixe o mais simples possível. O objetivo aqui é **aprender a testar os methods da Controller** .
-
-### Service
-
-```java
-@Service
-public class PersonService {
-    
-    //injected attributes
-    
-    @Autowired
-    private PersonRepository pr;
-
-
-    // ================================= READ =================================
-
-    // ============= FindAll =============
-    public List<Person> getAllPersons(){
-        return this.pr.findAll();
-    }
-
-
-    // ============= findByID =============
-    public Person getPersonById(Long id){
-        Optional<Person> pOptional = this.pr.findById(id);
-
-        if(pOptional.isEmpty()){
-            throw new PersonNotFoundException("Person not found");
-            
-        }
-        return pOptional.get();
-    }
- 
-    // ============= findByEmail =============
-    public Person getPersonByEmail(String email){
-        Optional<Person> pOptional = this.pr.findByEmail(email);
-
-        if(pOptional.isEmpty()){
-            throw new PersonNotFoundException("Person not found");    
-        }
-        return pOptional.get();
-
-    }
-
-
-    // ================================= CREATE =================================
-    public Person createPerson(PersonCreateDTO newPerson){
-        //validamos se o campo "name" foi inserido
-        if(newPerson.getName() == null){
-            throw new NameCannotBeNullException("Name nao pode estar em branco");
-        }
-
-        Person p1 = new Person();
-        p1.setName(newPerson.getName());
-        p1.setEmail(newPerson.getEmail());
-
-        return this.pr.save(p1);
-    }
-
-
-
-    // ================================= UPDATE =================================
-    public Person updatePerson(Long id, PersonCreateDTO dadosNovos){
-        Optional<Person> pOptional = this.pr.findById(id);
-
-        if(pOptional.isEmpty()){
-            throw new PersonNotFoundException("Nao eh possivel alterar, pois nao existe uma pessoa com esse #id");
-        }
-        
-        if(dadosNovos.getName() == null){
-            throw new NameCannotBeNullException("Name cannot be null");
-        }
-
-        Person p1 = pOptional.get();
-        p1.setName(dadosNovos.getName());
-        p1.setEmail(dadosNovos.getEmail());
-        
-        return this.pr.save(p1);
-    }
-
-
-    // ================================= DELETE =================================
-    public String deletePerson(Long id){
-        Optional<Person> pOptional = this.pr.findById(id);
-
-        if(pOptional.isEmpty()){
-            throw new NameCannotBeNullException("Nao eh possivel deletar, pois nao existe uma pessoa com esse #id");
-        }
-
-        this.pr.deleteById(id);
-
-        return "Deletado com sucesso!";
-    }
-}
-```
-
-📖 Na service, retornamos apenas objetos simples. Os ResonseEntity vamos deixar para Controller.
-
-<br>
-
-### Controller
-
-```java
-@RestController
-@RequestMapping("/api")
-public class PersonController {
-
-    //injected attributes
-    @Autowired
-    private PersonService ps;
-    
-    //rotas
-    
-    // ================================= READ =================================
-
-    // ============= FindAll =============
-    @GetMapping("/person")
-    public ResponseEntity<List<Person>> getAllPersons(){
-        return ResponseEntity.ok().body(this.ps.getAllPersons());
-    }
-
-
-    // ============= findByID =============
-    @GetMapping("/person/{id}")
-    public ResponseEntity<Person> getPersonById(@PathVariable(value = "id") Long id){
-        return ResponseEntity.ok().body(this.ps.getPersonById(id));
-    }
-
-    // ============= FindByEmail =============
-    @GetMapping("/person/by-email/{email}")
-    public ResponseEntity<Person> getPersonById(@PathVariable(value = "email") String email){
-        return ResponseEntity.ok().body(this.ps.getPersonByEmail(email));
-    }
-
-
-    // ================================= CREATE =================================
-    @PostMapping("/person")
-    public ResponseEntity<Person> createPerson(@RequestBody PersonCreateDTO newPerson){
-        return ResponseEntity.status(HttpStatus.CREATED).body(this.ps.createPerson(newPerson));
-    }
-
-
-    // ================================= UPDATE =================================
-    @PutMapping("/person/{id}")
-    public ResponseEntity<Person> createPerson(@PathVariable(value = "id") Long id, @RequestBody PersonCreateDTO dadosNovos){
-        return ResponseEntity.status(HttpStatus.OK).body(this.ps.updatePerson(id, dadosNovos));
-    }
-
-
-    // ================================= DELETE =================================
-    @DeleteMapping("/person/{id}")
-    public ResponseEntity<String> deletePerson(@PathVariable(value = "id") Long id){
-        return ResponseEntity.status(HttpStatus.OK).body(this.ps.deletePerson(id));
-    }
-}
-```
-
-<hr>
-<br>
-
-
-## Passo a passo para testar os methods da Controller Class  <img src="https://cdn4.iconfinder.com/data/icons/agile-methodology-flaticon/64/requirement-steps-planning-documents-clipboard-512.png" alt="icon image" width="70px" align="center">
-
-Antes de testar os methods da Controller é importante que voce ja tenha testado os methods da service e da repository.
-
-<br>
-
-
-1. Criamos uma classe teste para nossa controller, com as seguintes annotaions:
-
-    ```java
-    @WebMvcTest(PersonController.class) //informamos a controller class que vamos testar. É injetado automaticamente um objeto PersonController.
-    public class PersonControllerTest {
-        
-        //injected attributes
-        @Autowired
-        private MockMvc mockMvc; //esse eh o objeto que usamos para testar as rotas da nossa controller.
-
-        @Autowired
-        private ObjectMapper transformadorJson; //usamos esse cara/objeto para converter objetos do Java em objetos JSON e vice-versa.
-
-        @MockBean //vamos fingir/"mockar" o comportamento dos methods da class abaixo. Ou seja, todos os methods da PersonService que estiverem na PersonController serão "mockados".
-        private PersonService ps;
-
-        //tests
-        //......
-    }
-    ```
-
-
-<br>
-
-2. Padraozinho... Vamos criar os `@Test`, seguindo a convensao AAA (**arrange, act, assert**).
-
-
-
-
-💡Sempre que seus methods mockados forem receber como parametro um objeto complexo, use o `Mockito.any()`.
-
-💡Sempre que usar o `Mockito.any()`, todos os parametros precisam ser `Mockito.any()`.
-
-<hr>
-<br>
-
-## Praticando
-
-✏️ Teste todos os methods da controller. Pense nos testes mais mirabolantes possíveis. O objetivo é que seus methods estejam funcionando 100%.
-
-<br>
-
-```java
 @WebMvcTest(PersonController.class) //informamos a controller class que vamos testar. É injetado automaticamente um objeto PersonController.
 public class PersonControllerTest {
     
@@ -524,6 +325,4 @@ public class PersonControllerTest {
         .andDo(MockMvcResultHandlers.print()); //printamos para debugar.
     }
 }
-```
 
-Dale! We learned unit tests! 😎
