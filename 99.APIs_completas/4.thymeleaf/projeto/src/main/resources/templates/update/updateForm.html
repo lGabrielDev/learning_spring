@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"> <!-- Habilitamos o thymeleaf nesse template -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- CSS -->
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <!-- JQuery -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <title>Document</title>
+</head>
+<body>
+    <h2>Atualizar registro #<span th:text="${personToBeUpdated.id}">personId...</span> </div>
+    
+    <form method="post" th:action="@{/v1/api/person/{id} (id = ${personToBeUpdated.id})}" th:object="${personToBeUpdated}">
+        
+        <!-- #ID attribute -->
+        <div>
+            <label for="id_input">#ID</label>
+            <input id="id_input" type="text" th:value="${personToBeUpdated.id}" disabled>
+            
+        </div>
+
+        <!-- name attribute -->
+        <div>
+            <label for="name_input">Name</label>
+            <input id="name_input" type="text" th:field="*{name}">
+            <div class="alert alert-danger" th:each=" errorItem : ${listaErrosCampoName}"> <!-- Essa div so vai aparecer se o objeto "lista de erros" for passada pra essa view -->
+                <span th:text="${errorItem}">...</span>
+            </div>
+        </div>
+        <!-- age attribute -->
+        <div>
+            <label for="age_input">Age</label>
+            <input id="name_input" type="text" th:field="*{age}">
+            <div class= "alert alert-danger" th:each=" errorItem : ${listaErrosCampoAge}"> <!-- Essa div so vai aparecer se o objeto "lista de erros" for passada pra essa view -->
+                <span th:text="${errorItem}">...</span>
+            </div>
+        </div>
+        <button type="submit">Enviar request</button>
+    </form>
+    
+
+    <!-- back to person list -->
+    <a href="/v1/api/person">Back</a>
+
+</body>
+</html>

@@ -1,0 +1,31 @@
+
+/* div cabecalho */
+.fragment_div_title{
+    border: 2px solid tomato;
+    width: 300px;
+}
+
+/* form */
+form{
+    width: 300px;
+}
+
+/* sucess created message */
+.sucess_message{
+    width: 300px;
+}
+
+
+/* td buttons */
+th{
+    text-align: center;
+    padding: 8px;
+}
+
+td.td_buttons{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"> <!-- Habilitamos o thymeleaf nesse template -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- CSS -->
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <!-- JQuery -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <!-- Fontawesome -->
+    <script src="https://kit.fontawesome.com/a1863d7eac.js" crossorigin="anonymous"></script>
+    <!-- jS -->
+    <script src="/js/script.js"></script>
+    <title>Document</title>
+</head>
+<body>
+    <div th:replace="~{/fragments/fragments.html :: cabecalho('Read all persons')}">...</div>
+
+    <!-- success created message  -->
+    <div class="sucess_message alert alert-success" th:if="${sucessCreatedMessage != null}"> <!-- Essa div soh vai aparecer se tivermos enviado esse objeto pra essa view -->
+        <span th:text="${sucessCreatedMessage}">...</span>
+    </div>
+
+    <!-- success deleted  -->
+    <div class="sucess_message alert alert-success" th:if="${deletedSucess != null}"> <!-- Essa div soh vai aparecer se tivermos enviado esse objeto pra essa view -->
+        <span th:text="${deletedSucess}">...</span>
+    </div>
+
+    <!-- success updated  -->
+    <div class="sucess_message alert alert-success" th:if="${updatedSucess != null}"> <!-- Essa div soh vai aparecer se tivermos enviado esse objeto pra essa view -->
+        <span th:text="${updatedSucess}">...</span>
+    </div>
+
+    <table>
+        <tr>
+            <th>#ID</th>
+            <th id="sexo">Name</th>
+            <th>Age</th>
+            <th>Actions</th>
+        </tr>
+        <tr th:each=" person : ${personList}">
+            <td th:text="${person.getId()}">1</td>
+            <td th:text="${person.getName()}">sonic example name</td>
+            <td th:text="${person.getAge()}">sonic example name</td>
+            <!-- update and delete button -->
+            <td class="td_buttons">
+                <a th:href="@{/v1/api/person/{id}/edit (id=${person.id})}">
+                    <i class="fa-sharp fa-solid fa-pen-to-square" style="color: #70637e;"></i>
+                </a> 
+                <a th:href="@{/v1/api/person/delete/{id} (id=${person.id})}">
+                    <i class="fa-sharp fa-solid fa-user-minus"></i>
+                </a> 
+            </td>
+        </tr>
+    </table>
+
+    <a href="/v1/api/person/new">Create a Person</a>
+</body>
+</html>
