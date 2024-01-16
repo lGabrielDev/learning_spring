@@ -13,3 +13,4 @@
 1. [tests](./5.tests/0.tdd.md)
 1. [thymeleaf](./6.thymeleaf/0.starts/0.introduction.md)
 1. [swagger](./7.swagger/swagger.md)
+1. [design patterns](./8.design_pattern_padroes_de_projeto/1.builder.md)
