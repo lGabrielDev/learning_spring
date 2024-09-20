@@ -1,0 +1,32 @@
+{
+    "id": "153",
+    "name": "pokemon tal",
+    "weight": "tantos kg",
+    "height": 6,
+    "type": "water",
+    "spriteImage": "imagem do pokemon de frente",
+    "abilities":[
+        {
+            "abilityId": 1,
+            "name": "habilidade 1"
+        },
+        {
+            "abilityId": 2,
+            "name": "habilidade 2"
+        }
+    ],
+    "moves":[
+        {
+            "moveId": 1,
+            "name": "movimento tal 1"
+        },
+        {
+            "moveId": 2,
+            "name": "movimento tal 2"
+        },
+        {
+            "moveId": 3,
+            "name": "movimento tal 3"
+        }
+    ]
+}
