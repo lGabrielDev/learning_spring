@@ -3,245 +3,187 @@
     <img src="https://help.apiary.io/images/swagger-logo.png" alt="swagger icon" align="center" width="80px">
 </h1>
 
-O swagger é uma ferramente utilizada para documentar nossas APIs. Assim, conseguimos padronizar a maneira como explicamos nossos endpoints para outros devs. 
+O Swagger é uma ferramenta utilizada para documentar nossas APIs, permitindo padronizar a maneira como explicamos nossos endpoints para outros desenvolvedores.
 
-
-## Utilizando swagger com Java + Spring
 Para documentar nossa spring API é bem simples. Basta seguirmos esses passos:
 
-1. Colocar a dependencie da openApi(swagger):
-    ```xml
-    <dependency>
-        <groupId>org.springdoc</groupId>
-        <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-        <version>2.2.0</version>
-    </dependency>
-    ```
-    Quando colocamos essa dependencie na nossa aplicacao, automaticamente já recebemos uma pagina HTML do swagger. Para acessar essa pagina, acessamos a seguinte URI:
-
-
-    `http://localhost:8080/swagger-ui/index.html`
-
-
 <hr>
 <br>
 
-2. Ir na nossa class de configuracao de seguranca, onde contem `securityFilterChain()` method, e permitir o acesso aos seguintes endpoints: 
+## 1. Colocar a dependencie da [SpringDoc OpenAPI Starter WebMVC UI](https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui):
 
 
-    - `/api/v1/auth/**`
-    - `/v3/api-docs/**`
-    - `/v3/api-docs.yaml`
-    - `/swagger-ui/**`
-    - `/swagger-ui.html`
-
-    <br>
+```xml
+<dependency>
+    <groupId>org.springdoc</groupId>
+    <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+    <version>2.3.0</version>
+</dependency>
+```
     
-    `permitAll()`
+<br>
+
+Quando colocamos essa dependencie na nossa aplicacao, automaticamente já recebemos uma pagina HTML do swagger. Para acessar essa pagina, acessamos a seguinte URI:
+
+`http://localhost:8080/swagger-ui/index.html`
 
 <hr>
 <br>
 
-3. Criar uma class de configuracao para o swagger.
+## 2. Criamos nossas @Operations
 
-    É aqui que vamos configurar toda a pagina do swagger. Inclusive, setar a seguranca (basic auth, JWT, etc...).
+Vamos nas nossas Controllers e criar uma `@Operation` para cada endpoint desse Controller.
 
-    ```java
-    package br.com.lGabrielDev.todolist_project.swagger;
+💡 Para criar as tags(categorias/abas), crie no próprio Controller. Assim, todas as rotas desse Controller estarão no mesmo grupo.
 
-    import io.swagger.v3.oas.annotations.OpenAPIDefinition;
-    import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
-    import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
-    import io.swagger.v3.oas.annotations.info.Contact;
-    import io.swagger.v3.oas.annotations.info.Info;
-    import io.swagger.v3.oas.annotations.info.License;
-    import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-    import io.swagger.v3.oas.annotations.security.SecurityScheme;
-    import io.swagger.v3.oas.annotations.servers.Server;
-    import io.swagger.v3.oas.annotations.tags.Tag;
-
-    @OpenAPIDefinition(
-        info = @Info(
-            title = "Todo-List API",
-            description = "Todolist aplication using Java + Spring",
-            version = "1.0",
-            license = @License(
-                name = "MIT license",
-                url = "https://opensource.org/license/mit/"
-            ),
-            contact = @Contact(
-                name = "lGabrielDev"
-            )
-        ),
-        servers = {
-            @Server(
-                description = "Local Server",
-                url = "http://localhost:8080"
-            )
-        },
-        tags = {
-            @Tag(name = "admin", description = "admin authority needed"),
-            @Tag(name = "person", description = "regular users, without authentication"),
-            @Tag(name = "category", description = "from the authenticated person"),
-            @Tag(name = "task", description = "from the authenticated person"),
-        },
-        security = {
-            @SecurityRequirement(name = "simpleBasicAuth") //we pass the SecurityScheme 'name'
-        } 
-    )
-    @SecurityScheme(
-        name = "simpleBasicAuth", //you can choose whatever you want
-        scheme = "basic",
-        type = SecuritySchemeType.HTTP,
-        in = SecuritySchemeIn.HEADER
-    )
-    public class SwaggerConfig {}
-    ```
-
-<hr>
 <br>
 
-4. Ir em cada controller da nossa API e personalizar as responses.
+```java
+@RestController
+@RequestMapping("/api")
+@Tag(name = "controller1", description = "rotas da controller 1") //criamos uma categoria/aba para as rotas dessa Controller. Todas as rotas estarão no mesmo "grupo" lá no swagger
+public class PersonController1 {
+    
 
-    ```java
-    @RestController
-    @RequestMapping("/v1/api")
-    public class PersonController {
+    //rota 1
+    @Operation(description = "retorna uma pessoa insana 1") //configuramos esse endpoint lá no swagger
+    @ApiResponses( value = { //criamos as possiveis responses
+            @ApiResponse(responseCode = "200 OK", description = "retorna uma pessoa insana com sucesso"),
+            @ApiResponse(responseCode = "400 Bad Request", description = "fez algo errado")
+        }
+    )
+    @GetMapping("/rota1")
+    public ResponseEntity<Person> rota1(){
         
-        //injected attributes
-        @Autowired
-        private PersonService personService;
+        Person p1 = new PersonBuilder() //padrao de projeto builder =D
+            .setName("goku")
+            .setAge(44)
+            .build(); 
 
-        // ----------------------------------- CREATE -----------------------------------
-        @Operation(
-            tags = {"person"},
-            summary = "create a new person",
-            description = "You don't need to be authenticated to create a person. Anyone can do that.",
-            responses = {
-                @ApiResponse(
-                    responseCode = "201",
-                    description = "CREATED - successfully.",
-                    content = @Content(
-                        mediaType = "application/json",
-                        schema = @Schema(
-                            implementation = PersonFullDto.class
-                        )     
-                    )
-                ),
-                @ApiResponse(
-                    responseCode = "409",
-                    description = "CONFLICT - username or password is wrong.",
-                    content = @Content(
-                        mediaType = "application/json",
-                        schema = @Schema(implementation = DefaultExceptionBody.class)
-                    )
-                )
-            } 
-        )
-        @PostMapping("/person")
-        public ResponseEntity<PersonFullDto> createPerson(@RequestBody PersonCreateDto personDto){
-            return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(this.personService.createPerson(personDto));
-        }
-
-        // ------------------------- Give the ADMIN permission -------------------------
-        @Operation(
-            tags = {"admin"},
-            summary = "give the admin authority to a regular person",
-            description = "Only 'regular person' can receive that authority.",
-            responses = {
-                @ApiResponse(
-                    responseCode = "200",
-                    description = "OK - admin authority given sucessfully.",
-                    content = @Content(
-                        mediaType = "application/json",
-                        schema = @Schema(
-                            implementation = PersonFullDto.class
-                        )     
-                    )
-                ), 
-                @ApiResponse(
-                    responseCode = "401",
-                    description = "UNAUTHORIZED - username and password are wrong.",
-                    content = @Content() //no content
-                ), 
-                @ApiResponse(
-                    responseCode = "403",
-                    description = "FORBIDDEN - authenticated person does not have the admin authority.",
-                    content = @Content() //no content
-                ), 
-                @ApiResponse(
-                    responseCode = "404",
-                    description = "NOT_FOUND - person does not exists in our database.",
-                    content = @Content(
-                        mediaType = "application/json",
-                        schema = @Schema(implementation = DefaultExceptionBody.class)
-                    )
-                ),
-                @ApiResponse(
-                    responseCode = "417",
-                    description = "EXPECTATION_FAILED - person already has the admin authority.",
-                    content = @Content(
-                        mediaType = "application/json",
-                        schema = @Schema(implementation = DefaultExceptionBody.class)
-                    )
-                )
-            }
-        )
-        @PutMapping("/person/give-admin-permission/{id}")
-        public ResponseEntity<PersonFullDto> giveAdminPermission(@PathVariable(value = "id") Long id){
-            return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(this.personService.giveAdminPermission(id));   
-        }
-        
-        // ----------------------------------- READ -----------------------------------
-        @Operation(
-            tags = {"admin"},
-            summary = "read all persons",
-            responses = {
-                @ApiResponse(
-                    responseCode = "200",
-                    description = "List of all persons.",
-                    content = @Content(
-                        mediaType = "application/json",
-                        array = @ArraySchema(
-                            schema = @Schema(
-                                implementation = PersonWithoutTasksDto.class
-                            )
-                        )     
-                    )
-                ),
-                @ApiResponse(
-                    responseCode = "401",
-                    description = "UNAUTHORIZED - username and password are wrong.",
-                    content = @Content() //no content
-                ), 
-                @ApiResponse(
-                    responseCode = "403",
-                    description = "FORBIDDEN - authenticated person does not have the admin authority.",
-                    content = @Content() //no content
-                ), 
-            }
-        )
-        @GetMapping("/person")
-        public ResponseEntity<List<PersonWithoutTasksDto>> readAllPersons(){
-            return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(this.personService.readAllPersons());
-        }
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(p1);
     }
-    ```
+
+
+    //rota 2
+    @Operation(description = "retorna uma pessoa insana 2") //configuramos esse endpoint lá no swagger
+    @ApiResponses( value = { //criamos as possiveis responses
+            @ApiResponse(responseCode = "200 OK", description = "retorna uma pessoa insana com sucesso"),
+            @ApiResponse(responseCode = "400 Bad Request", description = "fez algo errado")
+        }
+    )
+    @GetMapping("/rota2")
+    public ResponseEntity<Person> rota2(){
+        
+        Person p1 = new PersonBuilder() //padrao de projeto builder =D
+            .setName("goku")
+            .setAge(44)
+            .build(); 
+
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(p1);
+    }
+}
+```
+
+<br>
+
+📖 Para adicionar uma tag/categoria a todos os endpoints de um Controlador, basta usar a anotação `@Tag` no próprio Controller. Isso aplica automaticamente a tag a todos os endpoints desse controlador.
+
+<br>
+
+Beleza, todos os endpoints foram configurados. Agora, precisamos setar as outras informacoes do swagger:
+
+- nome da API
+- versao
+- licensa
+- descricao
+- etc...
 
 <hr>
+<br>
+
+## 3. Criando nossa Class de @Configuration
+
+Aqui, vamos criar um `@Bean` para criar um objeto **OpenApi**.
+
+Sempre que for solicitado um objeto OpenApi, o spring utilizará esse objeto
+
+```java
+
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Contact;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.info.License;
+import io.swagger.v3.oas.models.servers.Server;
+
+@Configuration //Indica ao Spring que a classe contém definições de beans.
+public class SwaggerConfiguration {
+    
+    @Bean
+    public OpenAPI setandoConfig(){
+        return new OpenAPI()
+            .info(
+                new Info().title("API TAL TAL").description("informacoes tal tal tal")
+                    .license(
+                        new License().name("MIT").url("http://taltaltal.com.br")
+                    )
+                    .contact(
+                        new Contact().email("taltal@gmail.com").name("gabriel")
+                    )
+                    .version("50.4")
+            )
+            .servers(
+                List.of(
+                    new Server().url("http://localhost:8080")
+                    .description("servidor insano")
+                )
+            );
+            //tags.... etc....
+    }
+}
+```
+
+<br>
+
+⚠️ A classe de configuração deve estar no mesmo pacote que a classe principal da aplicação ou em uma subpasta desse pacote. Isso garante que o Spring consiga escanear e registrar a configuração corretamente.
+
 <br>
 
 Depois de tudo setadinho, você terá algo parecido com isso:
 
+`http://localhost:8080/swagger-ui/index.html`
+
 ![swagger image example](./imgs/swagger_image_example.png)
 
-Easy! 😎
+Pronto. Documentamos nossa API 😎
 
+<hr>
+<br>
 
+## O que é um Bean?
 
+Bean é um método que é executado sempre que iniciamos nossa aplicação Spring. Geralmente, são métodos que retornam algum objeto. Assim, quando a aplicação Spring é iniciada, ela instancia automaticamente esse objeto.
+
+Quando o Spring achar que deve utilizar esse objeto, ele o fará.
+
+<br>
+<br>
+
+## Entendendo o fluxo do @Bean que criamos
+
+1. Criamos um `@Bean` para um objeto, neste caso, um objeto **OpenAPI**. Quando a aplicação Spring iniciar, esse objeto será automaticamente instanciado.
+
+<br>
+
+2. Quando acessamos `http://localhost:8080/swagger-ui/index.html`, estamos solicitando a interface do Swagger.
+
+<br>
+
+3. O Spring verifica que precisa do objeto **OpenAPI**. Como já foi criado anteriormente com o `@Bean`, ele utiliza esse objeto.
+
+<br>
+
+4. O objeto OpenAPI que foi instanciado é retornado para ser usado na interface do Swagger, permitindo que a documentação da API seja exibida corretamente.
