@@ -197,3 +197,15 @@ Quando o Spring achar que deve utilizar esse objeto, ele o fará.
 <br>
 
 4. O objeto OpenAPI que foi instanciado é retornado para ser usado na interface do Swagger, permitindo que a documentação da API seja exibida corretamente.
+
+<br>
+<br>
+
+## Como ordenar os endpoints no swagger?
+
+Basta adicionar no `aplication.properties`
+
+```properties
+springdoc.swagger-ui.operationsSorter=method
+springdoc.swagger-ui.tagsSorter=alpha
+```
