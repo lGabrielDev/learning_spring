@@ -30,7 +30,17 @@ Quando colocamos essa dependencie na nossa aplicacao, automaticamente já recebe
 <hr>
 <br>
 
-## 2. Criamos nossas @Operations
+## 2. Adicionamos no aplication.properties
+
+```properties
+# definimos o caminho da url do swagger-ui
+springdoc.swagger-ui.path=/swagger-ui.html
+```
+
+<hr>
+<br>
+
+## 3. Criamos nossas @Operations
 
 Vamos nas nossas Controllers e criar uma `@Operation` para cada endpoint desse Controller.
 
@@ -105,7 +115,7 @@ Beleza, todos os endpoints foram configurados. Agora, precisamos setar as outras
 <hr>
 <br>
 
-## 3. Criando nossa Class de @Configuration
+## 4. Criando nossa Class de @Configuration
 
 Aqui, vamos criar um `@Bean` para criar um objeto **OpenApi**.
 
