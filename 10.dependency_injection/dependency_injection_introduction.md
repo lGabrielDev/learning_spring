@@ -3,6 +3,13 @@
     <img src="../imgs/injection_icon.png" alt="image example" align="center" width="100px">
 </h1>
 
+
+## Spring Boot
+
+<hr>
+<br>
+
+
 ## O que são Dependências?
 
 Na programação, uma classe frequentemente precisa de outras classes para funcionar corretamente. Por exemplo, um Computador pode precisar de um Mouse e de um Teclado. Nesse caso 'Mouse' e 'Teclado' são **dependências** da class Computer.
@@ -115,7 +122,7 @@ public class App{
 }
 ```
 
-⚠️ Se você não instanciar as dependências, você receberia um Null Pointer Exception. Precisamos instanciar de alguma forma, seja direto no atributo ou no construtor
+⚠️ Se você não instanciar as dependências, você receberia um Null Pointer Exception. Precisamos instanciar de alguma forma, seja direto no atributo ou no construtor.
 
 
 <br>
